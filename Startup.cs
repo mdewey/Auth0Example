@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace content
 {
@@ -26,11 +27,25 @@ namespace content
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
     {
+      services.AddAuthentication(options =>
+           {
+             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+
+           }).AddJwtBearer(options =>
+           {
+             options.Authority = "https://dev-33hedm2m.auth0.com";
+             options.Audience = "cXwmDwJDJkgMiK4PSEBJYSUqxliu6stl";
+           });
+
+
       services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
        .AddJsonOptions(options =>
       {
         options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
       });
+
+      services.AddEntityFrameworkNpgsql().AddDbContext<DatabaseContext>();
 
       services.AddHealthChecks();
       // Register the Swagger generator, defining 1 or more Swagger documents
@@ -44,6 +59,9 @@ namespace content
       {
         configuration.RootPath = "ClientApp/build";
       });
+
+
+
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -71,6 +89,8 @@ namespace content
       });
       app.UseStaticFiles();
       app.UseSpaStaticFiles();
+
+      app.UseAuthentication();
       app.UseMvc(routes =>
       {
         routes.MapRoute(

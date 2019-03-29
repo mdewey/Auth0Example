@@ -1,48 +1,56 @@
-import React, { Component } from 'react';
-
+import React, { Component } from 'react'
+import auth from '../Auth'
+import axios from 'axios'
 export class FetchData extends Component {
-  static displayName = FetchData.name;
+  static displayName = FetchData.name
 
-  constructor (props) {
-    super(props);
-    this.state = { forecasts: [], loading: true };
-
-    fetch('api/SampleData/WeatherForecasts')
-      .then(response => response.json())
-      .then(data => {
-        this.setState({ forecasts: data, loading: false });
-      });
+  constructor(props) {
+    super(props)
+    this.state = { monsters: [], loading: true }
   }
 
-  static renderForecastsTable (forecasts) {
+  componentDidMount() {
+    if (auth.isAuthenticated()) {
+      axios.defaults.headers.common = {
+        Authorization: auth.authorizationHeader()
+      }
+    }
+    axios.get('api/ping').then(data => {
+      // this.setState({ monsters: data.data, loading: false })
+    })
+  }
+
+  static renderForecastsTable(monsters) {
     return (
-      <table className='table table-striped'>
+      <table className="table table-striped">
         <thead>
           <tr>
-            <th>Date</th>
-            <th>Temp. (C)</th>
-            <th>Temp. (F)</th>
-            <th>Summary</th>
+            <th />
+            <th />
+            <th />
           </tr>
         </thead>
         <tbody>
-          {forecasts.map(forecast =>
-            <tr key={forecast.dateFormatted}>
-              <td>{forecast.dateFormatted}</td>
-              <td>{forecast.temperatureC}</td>
-              <td>{forecast.temperatureF}</td>
-              <td>{forecast.summary}</td>
+          {monsters.map(monster => (
+            <tr key={monster.id}>
+              <td>{monster.name}</td>
+              <td>{monster.cr}</td>
+              <td>{monster.totalHealth}</td>
             </tr>
-          )}
+          ))}
         </tbody>
       </table>
-    );
+    )
   }
 
-  render () {
-    let contents = this.state.loading
-      ? <p><em>Loading...</em></p>
-      : FetchData.renderForecastsTable(this.state.forecasts);
+  render() {
+    let contents = this.state.loading ? (
+      <p>
+        <em>Loading...</em>
+      </p>
+    ) : (
+      FetchData.renderForecastsTable(this.state.monsters)
+    )
 
     return (
       <div>
@@ -50,6 +58,6 @@ export class FetchData extends Component {
         <p>This component demonstrates fetching data from the server.</p>
         {contents}
       </div>
-    );
+    )
   }
 }
