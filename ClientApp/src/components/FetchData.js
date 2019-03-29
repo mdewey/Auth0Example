@@ -15,8 +15,8 @@ export class FetchData extends Component {
         Authorization: auth.authorizationHeader()
       }
     }
-    axios.get('api/ping').then(data => {
-      // this.setState({ monsters: data.data, loading: false })
+    axios.get('api/monsters').then(data => {
+      this.setState({ monsters: data.data, loading: false })
     })
   }
 
@@ -54,7 +54,7 @@ export class FetchData extends Component {
 
     return (
       <div>
-        <h1>Weather forecast</h1>
+        <h1>Current Monsters</h1>
         <p>This component demonstrates fetching data from the server.</p>
         {contents}
       </div>
